@@ -7,9 +7,9 @@ import java.util.*;
 
 
 public class GPXcalculatorTest {
-	//general test, ie. with two working points a, b
+	//general test testing equivalence class where output is non-zero and positive, ie. with 5 working points a, b, c, d, e, and 2 segments, segments and segments2
 	@Test
-	public void test_1() {
+	public void testPositiveDistance() {
 		GPXtrkpt a= new GPXtrkpt(0, 0, null);
 		GPXtrkpt b= new GPXtrkpt(3, 4, null);
 		GPXtrkpt c= new GPXtrkpt(3, 5, null);
@@ -28,6 +28,7 @@ public class GPXcalculatorTest {
 		ArrayList<GPXtrkseg> seglist2= new ArrayList<GPXtrkseg>();
 		seglist.add(segments);
 		seglist2.add(segments2);
+		//test segment 1
 		GPXtrk gp= new GPXtrk("seglist", seglist);
 		assertEquals(GPXcalculator.calculateDistanceTraveled(gp), 6.0, 0.1);
 		//test segment 2
@@ -39,23 +40,46 @@ public class GPXcalculatorTest {
 		assertEquals(GPXcalculator.calculateDistanceTraveled(gp), 7.0, 0.1);
 		}
 	
+	//general test testing equivalence class where calculated distance is 0, ie. with 2 working points a, b, and 1 segment
+	@Test
+	public void testZeroDistance() {
+		GPXtrkpt a= new GPXtrkpt(3, 4, null);
+		GPXtrkpt b= new GPXtrkpt(3, 4, null);
+		
+		ArrayList<GPXtrkpt> points= new ArrayList<GPXtrkpt>();
+		
+		points.add(a);
+		points.add(b);
+		
+		GPXtrkseg segments= new GPXtrkseg(points);
+
+		ArrayList<GPXtrkseg> seglist= new ArrayList<GPXtrkseg>();
+
+		seglist.add(segments);
+
+		//test segment 1
+		GPXtrk gp= new GPXtrk("seglist", seglist);
+		assertEquals(GPXcalculator.calculateDistanceTraveled(gp), 0.0, 0.1);
+		
+		}
+	
 	//if GPXtrk object is null, method should return -1
 	@Test
-	public void test_2() {
+	public void testNullGPXtrk() {
 		GPXtrk emptyclass= null;
 		assertEquals(GPXcalculator.calculateDistanceTraveled(emptyclass), -1.0, 0.01);
 	}
 	
 	//if GPXtrk contains no GPXtrkseg object, the method should return -1
 	@Test
-	public void test_3() {
+	public void testEmptyTrk() {
 		GPXtrk empty= new GPXtrk("GPX Test", new ArrayList<GPXtrkseg>());
 		assertEquals(GPXcalculator.calculateDistanceTraveled(empty), -1.0, 0.01);
 	}
 	
 	//if GPXtrkseg in the GPXtrk is null, distance traveled for that GPXtrkseg should be considered 0
 	@Test
-	public void test_4() {
+	public void testNullSeg() {
 		GPXtrkseg emptyseg= null;
 		ArrayList<GPXtrkseg> list= new ArrayList<GPXtrkseg>();
 		list.add(emptyseg);
@@ -65,7 +89,7 @@ public class GPXcalculatorTest {
 	
 	//if a GPXtrkseg contains no GPXtrkpt objects, the distance traveled for that GPXtrkseg should be considered 0
 	@Test
-	public void test_5() {
+	public void testEmptySeg() {
 		GPXtrkseg emptyseg= new GPXtrkseg(new ArrayList<GPXtrkpt>());
 		ArrayList<GPXtrkseg> list= new ArrayList<GPXtrkseg>();
 		list.add(emptyseg);
@@ -75,7 +99,7 @@ public class GPXcalculatorTest {
 	
 	//if a GPXtrkseg contains only one GPXtrkpt, the distance traveled for the GPXtrkseg should be considered 0
 	@Test
-	public void test_6() {
+	public void testSinglePoint() {
 		GPXtrkpt a= new GPXtrkpt(0, 0, null);
 		ArrayList<GPXtrkpt> listpoints= new ArrayList<GPXtrkpt>();
 		listpoints.add(a);
@@ -88,7 +112,7 @@ public class GPXcalculatorTest {
 	
 	//If any GPXtrkpt in a GPXtrkseg is null, the distance traveled for that GPXtrkseg should be considered 0
 	@Test
-	public void test_7() {
+	public void testNullPoint() {
 		GPXtrkpt a= new GPXtrkpt(0, 0, null);
 		GPXtrkpt b= null;
 		ArrayList<GPXtrkpt> listpoints= new ArrayList<GPXtrkpt>();
@@ -103,7 +127,7 @@ public class GPXcalculatorTest {
 	
 	//If any GPXtrkpt has a latitude greater than 90 or less than -90, the distance traveled for thatGPX trkseg should be considered 0
 	@Test
-	public void test_8() {
+	public void testLatitudeGreater() {
 		//latitude of a is greater than 90
 		GPXtrkpt a= new GPXtrkpt(91, 0, null);
 		GPXtrkpt a2= new GPXtrkpt(87, 0, null);
@@ -117,7 +141,7 @@ public class GPXcalculatorTest {
 		assertEquals(GPXcalculator.calculateDistanceTraveled(single), 0.0, 0.01);
 	}
 	@Test
-	public void test_9() {
+	public void testLatitudeLesser() {
 		//latitude of b is less than -90
 		ArrayList<GPXtrkpt> listpoints= new ArrayList<GPXtrkpt>();
 		GPXtrkpt b= new GPXtrkpt(-91, 0, null);
@@ -132,7 +156,7 @@ public class GPXcalculatorTest {
 	}
 	
 	@Test
-	public void test_10() {
+	public void testMaxLatitude() {
 		
 		//latitude of c is exactly 90, ie. should work
 		ArrayList<GPXtrkpt> listpoints= new ArrayList<GPXtrkpt>();
@@ -148,7 +172,7 @@ public class GPXcalculatorTest {
 	}
 	
 	@Test
-	public void test_11() {
+	public void testMinLatitude() {
 		
 		//latitude of d is exactly -90, ie. should work
 		ArrayList<GPXtrkpt> listpoints= new ArrayList<GPXtrkpt>();
@@ -165,7 +189,7 @@ public class GPXcalculatorTest {
 	
 	//If any GPXtrkpt in a GPXtrkseg has a longitude that is greater than 180 or less than -180 the distance traveled is 0
 	@Test
-	public void test_12() {
+	public void testGreaterLongitude() {
 		//longitude of a is greater than 180
 		GPXtrkpt a= new GPXtrkpt(0, 181, null);
 		GPXtrkpt a2= new GPXtrkpt(0, 0, null);
@@ -180,7 +204,7 @@ public class GPXcalculatorTest {
 		
 	}
 	@Test
-	public void test_13() {
+	public void testLesserLongitude() {
 		
 		//longitude of b2 is less than -181
 		GPXtrkpt b= new GPXtrkpt(0, 0, null);
@@ -195,7 +219,7 @@ public class GPXcalculatorTest {
 		assertEquals(GPXcalculator.calculateDistanceTraveled(single2), 0.0, 0.01);
 	}
 	@Test
-	public void test_14() {
+	public void testMaxLongitude() {
 		
 		//longitude of c2 is exactly 180
 		GPXtrkpt c= new GPXtrkpt(0, 179, null);
@@ -209,7 +233,7 @@ public class GPXcalculatorTest {
 		GPXtrk single3= new GPXtrk("single", singlelist3);
 		assertEquals(GPXcalculator.calculateDistanceTraveled(single3), 1.0, 0.01);
 	}
-	@Test public void test_15() {
+	@Test public void testMinLongitude() {
 		
 		//longitude of d2 is exactly -180
 		GPXtrkpt d= new GPXtrkpt(0, -179, null);
